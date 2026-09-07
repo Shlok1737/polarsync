@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PolarSync — Smart Energy Management</title>
+<style>
+:root{--bg:#071018;--panel:#0d1a25;--panel2:#102230;--line:#1e3444;--text:#edf7fb;--muted:#8da5b3;--cyan:#52d6e8;--green:#63e6a5;--amber:#ffc857;--red:#ff6b6b;--blue:#79a7ff}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:#050505;color:var(--text)}
+button{font:inherit}.app{display:flex;min-height:100vh}.sidebar{width:245px;border-right:1px solid var(--line);padding:24px 16px;background:rgba(5,13,19,.82);position:sticky;top:0;height:100vh}
+.logo{display:flex;align-items:center;gap:11px;margin:4px 10px 32px}.logo-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--cyan),#7aa8ff);display:grid;place-items:center;color:#061018;font-weight:900}.logo b{font-size:18px}.logo small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.nav button{width:100%;text-align:left;border:1px solid transparent;background:#000000;color:#ffffff;padding:12px 14px;border-radius:10px;margin:3px 0;cursor:pointer}.nav button.active,.nav button:hover{background:#ffffff;color:#000000;border-color:#ffffff}.station{position:absolute;bottom:22px;left:16px;right:16px;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}.station small{color:var(--muted)}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:7px}
+main{flex:1;padding:28px 34px;max-width:1500px;margin:auto;width:100%}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}.eyebrow{color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.top h1{margin:5px 0 0;font-size:28px}.top p{margin:5px 0 0;color:var(--muted)}.actions{display:flex;gap:9px}.btn{border:1px solid #ffffff;background:#000000;color:#ffffff;padding:9px 13px;border-radius:9px;cursor:pointer}.btn.primary{background:#ffffff;border-color:#ffffff;color:#000000;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:linear-gradient(180deg,rgba(16,34,48,.94),rgba(11,24,34,.94));border:1px solid var(--line);border-radius:14px;padding:18px}.metric-label{color:var(--muted);font-size:12px}.metric{font-size:27px;font-weight:800;margin-top:8px}.metric span{font-size:13px;color:var(--muted);font-weight:500}.trend{margin-top:7px;font-size:12px;color:var(--green)}.warn{color:var(--amber)}
+.layout{display:grid;grid-template-columns:1.65fr 1fr;gap:14px;margin-top:14px}.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.card h2{font-size:15px;margin:0}.card-head small{color:var(--muted)}.chart-wrap{height:240px;position:relative}.chart{width:100%;height:100%}.legend{display:flex;gap:18px;color:var(--muted);font-size:11px;margin-top:5px}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mini{padding:12px;border:1px solid var(--line);border-radius:10px;background:#0b1720}.mini b{font-size:19px}.mini small{display:block;color:var(--muted);margin-top:3px}
+.reco{border:1px solid #665027;background:rgba(255,200,87,.07);border-radius:12px;padding:15px;margin-top:12px}.reco .tag{color:var(--amber);font-size:11px;font-weight:800;letter-spacing:.08em}.reco h3{margin:7px 0 5px;font-size:16px}.reco p{color:var(--muted);font-size:12px;line-height:1.5;margin:0 0 12px}.reco button{width:100%}
+.gap{height:8px;background:#142733;border-radius:8px;overflow:hidden}.gap > div{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--cyan),var(--green))}
+.loads{margin-top:14px}.load{display:grid;grid-template-columns:1fr 120px 80px;gap:15px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.load:last-child{border-bottom:0}.load b{font-size:13px}.load small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.badge{justify-self:end;border:1px solid var(--line);padding:5px 8px;border-radius:20px;font-size:10px}.critical{color:var(--red);border-color:#5c3030}.important{color:var(--amber);border-color:#665027}.noncritical{color:var(--green);border-color:#28553e}.toggle{width:42px;height:23px;border-radius:20px;border:1px solid #ffffff;background:#000000;position:relative;cursor:pointer}.toggle:after{content:"";position:absolute;width:17px;height:17px;top:3px;left:3px;border-radius:50%;background:#8296a0;transition:.2s}.toggle.on{background:#ffffff}.toggle.on:after{left:22px;background:#000000}
+.notice{display:flex;gap:12px;align-items:flex-start;padding:13px;border:1px solid var(--line);border-radius:11px;background:#0b1720;margin-top:14px;color:var(--muted);font-size:12px;line-height:1.5}.notice b{color:var(--text)}
+.footer{color:#617986;text-align:center;font-size:10px;padding:22px}
+.page{display:none}.page.active{display:block}
+@media(max-width:1000px){.sidebar{width:190px}.grid{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}}
+@media(max-width:650px){.sidebar{display:none}main{padding:20px 15px}.grid{grid-template-columns:1fr 1fr}.top{align-items:flex-start;gap:10px}.actions .btn:not(.primary){display:none}.load{grid-template-columns:1fr 65px}.load .toggle{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo"><div class="logo-mark">P</div><div><b>PolarSync</b><small>AI ENERGY CONTROL</small></div></div>
+  <div class="nav">
+    <button class="active" data-page="dashboard">◈ &nbsp; Dashboard</button>
+    <button data-page="forecast">◌ &nbsp; 24h Forecast</button>
+    <button data-page="loads">▣ &nbsp; Load Priorities</button>
+    <button data-page="data">⌁ &nbsp; Data & Health</button>
+  </div>
+  <div class="station"><small>STATION STATUS</small><div style="margin-top:7px"><span class="dot"></span>Offline-first / Ready</div></div>
+</aside>
+<main>
+<section id="dashboard" class="page active">
+  <div class="top"><div><div class="eyebrow">Station Commander Dashboard</div><h1>Energy Command Center</h1><p>Predict tomorrow. Balance solar + fuel. Protect critical loads.</p></div><div class="actions"><button class="btn" id="importBtn">⇧ Import CSV</button><button class="btn" id="refresh">↻ Refresh</button><button class="btn primary" id="simulate">Run AI Plan</button><input id="csvFile" type="file" accept=".csv" hidden></div></div>
+  <div class="grid">
+    <div class="card"><div class="metric-label">SOLAR OUTPUT</div><div class="metric" id="solar">68 <span>kW</span></div><div class="trend">↑ Renewable window active</div></div>
+    <div class="card"><div class="metric-label">CURRENT DEMAND</div><div class="metric" id="demand">61 <span>kW</span></div><div class="trend">Within expected band</div></div>
+    <div class="card"><div class="metric-label">BATTERY RESERVE</div><div class="metric">71 <span>%</span></div><div class="trend">Safe reserve protected</div></div>
+    <div class="card"><div class="metric-label">FUEL STATUS</div><div class="metric">STANDBY</div><div class="trend warn">Prepare if gap persists</div></div>
+  </div>
+  <div class="layout">
+    <div class="card"><div class="card-head"><h2>Tomorrow — 24-hour energy forecast</h2><small>Illustrative AI forecast</small></div><div class="chart-wrap"><svg class="chart" viewBox="0 0 900 285" preserveAspectRatio="none" id="chart"></svg></div><div class="legend"><span><i style="background:#52d6e8"></i>Demand</span><span><i style="background:#63e6a5"></i>Solar</span></div></div>
+    <div class="card"><div class="card-head"><h2>Next-day gap analysis</h2><small>Planning horizon</small></div>
+      <div class="kpis"><div class="mini"><small>Predicted demand</small><b>920 kWh</b></div><div class="mini"><small>Predicted solar</small><b>510 kWh</b></div></div>
+      <div style="margin-top:15px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>Renewable coverage</span><b style="color:var(--text)">55%</b></div><div class="gap" style="margin-top:7px"><div style="width:55%"></div></div></div>
+      <div class="reco"><div class="tag">⚠ AI RECOMMENDATION</div><h3>Prepare fuel · preserve battery</h3><p>Expected gap is <b style="color:var(--text)">410 kWh</b>. Reschedule flexible laboratory loads into the strongest solar window.</p><button class="btn primary" id="approve">Review & Approve Plan</button></div>
+    </div>
+  </div>
+  <div class="card loads"><div class="card-head"><h2>Load priority & safety</h2><small>Human-in-the-loop</small></div>
+    <div class="load"><div><b>Heating & life-safety</b><small>Never auto-switched off</small></div><span class="badge critical">TIER 1 · CRITICAL</span><button class="toggle on" disabled></button></div>
+    <div class="load"><div><b>Laboratory equipment</b><small>Schedulable / flexible</small></div><span class="badge important">TIER 2 · IMPORTANT</span><button class="toggle on" data-toggle></button></div>
+    <div class="load"><div><b>Charging & recreation</b><small>First candidates for reduction</small></div><span class="badge noncritical">TIER 3 · NON-CRITICAL</span><button class="toggle on" data-toggle></button></div>
+  </div>
+  <div id="toast" style="display:none;position:fixed;right:22px;bottom:22px;z-index:50;background:#102230;border:1px solid #2d5267;padding:13px 16px;border-radius:10px;box-shadow:0 12px 40px #0008;font-size:12px"></div><div class="notice">🛡 <div><b>Safety rule:</b> PolarSync recommends actions; the Station Commander or authorized staff approves the final switch or load reduction. <b>No automatic shutdown of critical loads.</b></div></div>
+</section>
+
+<section id="forecast" class="page">
+  <div class="top"><div><div class="eyebrow">Forecasting</div><h1>24-hour Forecast</h1><p>Demand and solar availability used by the decision engine.</p></div></div>
+  <div class="card"><div class="card-head"><h2>Hourly forecast</h2><small>Next 24 hours</small></div><div class="chart-wrap" style="height:360px"><svg class="chart" viewBox="0 0 900 360" preserveAspectRatio="none" id="chart2"></svg></div></div>
+  <div class="grid" style="margin-top:14px"><div class="card"><div class="metric-label">DEMAND FORECAST</div><div class="metric">920 <span>kWh</span></div></div><div class="card"><div class="metric-label">SOLAR FORECAST</div><div class="metric">510 <span>kWh</span></div></div><div class="card"><div class="metric-label">ENERGY GAP</div><div class="metric">410 <span>kWh</span></div></div><div class="card"><div class="metric-label">FORECAST CONFIDENCE</div><div class="metric">87 <span>%</span></div></div></div>
+</section>
+
+<section id="loads" class="page">
+  <div class="top"><div><div class="eyebrow">Safety & control</div><h1>Load Priorities</h1><p>Transparent tiers for safe demand reduction.</p></div></div>
+  <div class="card">
+    <div class="load"><div><b>Heating, emergency communication & life-safety</b><small>Protected at all times</small></div><span class="badge critical">TIER 1</span><button class="toggle on" disabled></button></div>
+    <div class="load"><div><b>Flexible laboratory equipment & water heating</b><small>Reduce or reschedule when needed</small></div><span class="badge important">TIER 2</span><button class="toggle on" data-toggle></button></div>
+    <div class="load"><div><b>Non-essential lighting, charging & recreation</b><small>First candidates for reduction</small></div><span class="badge noncritical">TIER 3</span><button class="toggle on" data-toggle></button></div>
+  </div>
+  <div class="notice">🛡 <div><b>Human-in-the-loop:</b> all proposed actions require authorized human approval. Tier-1 critical loads are never automatically switched off.</div></div>
+</section>
+
+<section id="data" class="page">
+  <div class="top"><div><div class="eyebrow">Offline-first</div><h1>Data & System Health</h1><p>Graceful degradation when sensors or external inputs are unavailable.</p></div></div>
+  <div class="grid">
+    <div class="card"><div class="metric-label">LOCAL DATA</div><div class="metric">READY</div><div class="trend">Historical + synthetic logs</div></div>
+    <div class="card"><div class="metric-label">WEATHER INPUT</div><div class="metric">AVAILABLE</div><div class="trend">Forecast confidence normal</div></div>
+    <div class="card"><div class="metric-label">MODEL STATUS</div><div class="metric">FRESH</div><div class="trend">Demand + solar models</div></div>
+    <div class="card"><div class="metric-label">TELEMETRY</div><div class="metric">CONNECTED</div><div class="trend">Battery / fuel / meters</div></div>
+  </div>
+  <div class="card" style="margin-top:14px"><div class="card-head"><h2>Failure-mode policy</h2><small>Safe degradation</small></div>
+    <div class="load"><div><b>Sensor / meter offline</b><small>Use last valid reading + conservative safety margin</small></div><span class="badge important">SAFE FALLBACK</span></div>
+    <div class="load"><div><b>Weather unavailable</b><small>Use worst-case solar assumption and flag lower confidence</small></div><span class="badge important">SAFE FALLBACK</span></div>
+    <div class="load"><div><b>Model stale / low confidence</b><small>Widen safety margins and require human review</small></div><span class="badge critical">HUMAN REVIEW</span></div>
+    <div class="load"><div><b>Fuel / battery telemetry missing</b><small>No automatic switching; show manual-check alert</small></div><span class="badge critical">MANUAL CHECK</span></div>
+  </div>
+</section>
+<div class="footer">PolarSync · Smart India Hackathon 2026 · Software-only, offline-first prototype</div>
+</main>
+</div>
+<script>
+const demand=[48,44,52,55,60,68,72,76,80,72,68,64,58,54,52,55,60,66,72,68,62,58,52,50];
+const solar=[0,0,0,0,4,18,30,55,82,90,85,72,65,48,30,18,8,0,0,0,0,0,0,0];
+function drawChart(id,h=285){
+ const svg=document.getElementById(id), W=900,H=h,pad=38,max=100;
+ const x=i=>pad+i*(W-pad*2)/(demand.length-1), y=v=>H-35-v*(H-70)/max;
+ let s='';
+ for(let v=0;v<=100;v+=25){s+=`<line x1="${pad}" x2="${W-pad}" y1="${y(v)}" y2="${y(v)}" stroke="#1e3444" stroke-width="1"/><text x="5" y="${y(v)+4}" fill="#617986" font-size="10">${v}</text>`}
+ function path(a){return a.map((v,i)=>(i?'L':'M')+x(i)+' '+y(v)).join(' ')}
+ s+=`<path d="${path(solar)}" fill="none" stroke="#63e6a5" stroke-width="3"/>`;
+ s+=`<path d="${path(demand)}" fill="none" stroke="#52d6e8" stroke-width="3"/>`;
+ for(let i=0;i<24;i+=4)s+=`<text x="${x(i)-7}" y="${H-10}" fill="#617986" font-size="10">${String(i).padStart(2,'0')}:00</text>`;
+ svg.innerHTML=s;
+}
+drawChart('chart');drawChart('chart2',360);
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(b.dataset.page).classList.add('active')});
+document.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
+document.getElementById('refresh').onclick=()=>{document.getElementById('solar').innerHTML=(65+Math.floor(Math.random()*8))+' <span>kW</span>';document.getElementById('demand').innerHTML=(58+Math.floor(Math.random()*9))+' <span>kW</span>'};
+document.getElementById('simulate').onclick=()=>{alert('AI plan generated:\\nPrepare fuel → preserve battery → reschedule flexible loads.\\n\\nNo Tier-1 load will be switched off automatically.')};
+document.getElementById('approve').onclick=()=>{alert('Plan queued for Station Commander approval.\\n\\nRecommended actions:\\n• Preserve battery reserve\\n• Prepare fuel\\n• Reschedule flexible laboratory loads')};
+
+// PolarSync local application engine
+const state = JSON.parse(localStorage.getItem('polarsync-state') || '{"approved":false,"simulationRuns":0,"lastUpdated":null,"loads":{"lab":true,"rec":true}}');
+function save(){localStorage.setItem('polarsync-state',JSON.stringify(state))}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.style.display='none',2600)}
+document.getElementById('importBtn').onclick=()=>document.getElementById('csvFile').click();
+document.getElementById('csvFile').onchange=async(e)=>{
+ const f=e.target.files[0]; if(!f)return;
+ const text=await f.text(); const rows=text.trim().split(/\r?\n/);
+ if(rows.length<2){toast('CSV has no data rows');return}
+ const headers=rows[0].split(',').map(x=>x.trim().toLowerCase());
+ const d=headers.indexOf('demand'), s=headers.indexOf('solar');
+ if(d<0 || s<0){toast('CSV needs demand and solar columns');return}
+ const vals=rows.slice(1).map(r=>r.split(',')).filter(r=>r.length>Math.max(d,s));
+ const avg=(i)=>vals.reduce((a,r)=>a+(parseFloat(r[i])||0),0)/vals.length;
+ const dv=Math.round(avg(d)*24), sv=Math.round(avg(s)*24);
+ toast(`Imported ${vals.length} rows · demand ${dv} kWh · solar ${sv} kWh`);
+ document.querySelector('#forecast .metric').innerHTML=dv+' <span>kWh</span>';
+};
+document.getElementById('simulate').onclick=()=>{
+ state.simulationRuns++;state.lastUpdated=new Date().toISOString();save();
+ const gap=410;
+ toast('AI plan generated · '+gap+' kWh expected gap · review required');
+ alert('POLARSYNC AI PLAN\n\n1. Prepare fuel\n2. Preserve battery reserve\n3. Reschedule flexible laboratory loads\n4. Do NOT switch off Tier-1 critical loads automatically\n\nStatus: Awaiting Station Commander approval.');
+};
+document.getElementById('approve').onclick=()=>{
+ state.approved=true;state.lastUpdated=new Date().toISOString();save();
+ toast('Plan approved locally · action log updated');
+};
+document.getElementById('refresh').onclick=()=>{
+ document.getElementById('solar').innerHTML=(65+Math.floor(Math.random()*8))+' <span>kW</span>';
+ document.getElementById('demand').innerHTML=(58+Math.floor(Math.random()*9))+' <span>kW</span>';
+ state.lastUpdated=new Date().toISOString();save();toast('Telemetry refreshed');
+};
+document.querySelectorAll('[data-toggle]').forEach((b,i)=>{
+ b.onclick=()=>{b.classList.toggle('on');state.loads[i?'rec':'lab']=b.classList.contains('on');save();toast('Flexible load setting saved locally')}
+});
+</script>
+</body>
+</html>
